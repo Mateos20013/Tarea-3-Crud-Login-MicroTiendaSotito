@@ -6,10 +6,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 
 import { ProductosService } from '../../core/services/productos.service';
 import { Producto } from '../../core/models';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog.component';
 
 @Component({
   selector: 'app-productos-list',
@@ -22,6 +26,9 @@ import { Producto } from '../../core/models';
     MatTableModule,
     MatInputModule,
     MatFormFieldModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatDialogModule,
     RouterLink
   ],
   template: `
@@ -41,7 +48,13 @@ import { Producto } from '../../core/models';
 
       <mat-card class="table-card">
         <mat-card-content>
-          <div *ngIf="productos.length === 0" class="empty-state">
+          <!-- Loading State -->
+          <div *ngIf="loading" class="loading-state">
+            <mat-spinner></mat-spinner>
+            <p>Cargando productos...</p>
+          </div>
+
+          <div *ngIf="!loading && productos.length === 0" class="empty-state">
             <mat-icon class="empty-icon">inventory</mat-icon>
             <h3>No hay productos registrados</h3>
             <p>Comienza agregando tu primer producto al inventario</p>
@@ -50,7 +63,7 @@ import { Producto } from '../../core/models';
             </button>
           </div>
 
-          <div *ngIf="productos.length > 0" class="products-grid">
+          <div *ngIf="!loading && productos.length > 0" class="products-grid">
             <mat-card *ngFor="let producto of productos" class="product-card">
               <mat-card-header>
                 <mat-card-title>{{ producto.nombre }}</mat-card-title>
@@ -124,6 +137,16 @@ import { Producto } from '../../core/models';
       margin-bottom: 24px;
     }
 
+    .loading-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: #666;
+    }
+
+    .loading-state mat-spinner {
+      margin: 0 auto 16px auto;
+    }
+
     .products-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -187,7 +210,11 @@ export class ProductosListComponent implements OnInit {
   productos: Producto[] = [];
   loading = false;
 
-  constructor(private productosService: ProductosService) {}
+  constructor(
+    private productosService: ProductosService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.cargarProductos();
@@ -199,24 +226,43 @@ export class ProductosListComponent implements OnInit {
       next: (productos) => {
         this.productos = productos || [];
         this.loading = false;
+        console.log('✅ Productos cargados:', productos.length);
       },
       error: (error) => {
-        console.error('Error al cargar productos:', error);
+        console.error('❌ Error al cargar productos:', error);
         this.loading = false;
+        this.snackBar.open('Error al cargar productos', 'Cerrar', { duration: 3000 });
       }
     });
   }
 
   eliminarProducto(id: number): void {
-    if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-      this.productosService.deleteProducto(id).subscribe({
-        next: () => {
-          this.cargarProductos(); // Recargar la lista
-        },
-        error: (error) => {
-          console.error('Error al eliminar producto:', error);
-        }
-      });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '300px',
+      data: {
+        titulo: 'Confirmar eliminación',
+        mensaje: '¿Estás seguro de que deseas eliminar este producto?',
+        textoConfirmar: 'Eliminar',
+        textocancelar: 'Cancelar'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loading = true;
+        this.productosService.deleteProducto(id).subscribe({
+          next: () => {
+            this.loading = false;
+            this.snackBar.open('Producto eliminado exitosamente', 'Cerrar', { duration: 3000 });
+            this.cargarProductos(); // Recargar la lista
+          },
+          error: (error) => {
+            this.loading = false;
+            console.error('❌ Error al eliminar producto:', error);
+            this.snackBar.open('Error al eliminar producto', 'Cerrar', { duration: 3000 });
+          }
+        });
+      }
+    });
   }
 }
