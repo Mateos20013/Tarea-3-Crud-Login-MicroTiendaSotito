@@ -35,8 +35,18 @@ namespace MicroTienda.API.DTOs
     {
         public string Token { get; set; } = string.Empty;
         public DateTime Expiration { get; set; }
+        public UsuarioDto Usuario { get; set; } = new UsuarioDto();
+    }
+
+    public class UsuarioDto
+    {
+        public int UsuarioId { get; set; }
         public string NombreUsuario { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
+        public string NombreCompleto { get; set; } = string.Empty;
         public string Rol { get; set; } = string.Empty;
+        public bool Activo { get; set; }
+        public DateTime FechaCreacion { get; set; }
+        public DateTime? FechaModificacion { get; set; }
     }
 }

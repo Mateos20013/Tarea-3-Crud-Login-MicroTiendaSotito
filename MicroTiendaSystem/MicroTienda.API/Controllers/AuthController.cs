@@ -39,9 +39,17 @@ namespace MicroTienda.API.Controllers
             {
                 Token = token,
                 Expiration = DateTime.UtcNow.AddMinutes(expiryInMinutes),
-                NombreUsuario = usuario.NombreUsuario,
-                Email = usuario.Email,
-                Rol = usuario.Rol
+                Usuario = new UsuarioDto
+                {
+                    UsuarioId = usuario.UsuarioId,
+                    NombreUsuario = usuario.NombreUsuario,
+                    Email = usuario.Email,
+                    NombreCompleto = usuario.NombreCompleto,
+                    Rol = usuario.Rol,
+                    Activo = usuario.Activo,
+                    FechaCreacion = usuario.FechaCreacion,
+                    FechaModificacion = usuario.FechaModificacion
+                }
             });
         }
 
@@ -80,9 +88,17 @@ namespace MicroTienda.API.Controllers
             {
                 Token = token,
                 Expiration = DateTime.UtcNow.AddMinutes(expiryInMinutes),
-                NombreUsuario = usuario.NombreUsuario,
-                Email = usuario.Email,
-                Rol = usuario.Rol
+                Usuario = new UsuarioDto
+                {
+                    UsuarioId = usuario.UsuarioId,
+                    NombreUsuario = usuario.NombreUsuario,
+                    Email = usuario.Email,
+                    NombreCompleto = usuario.NombreCompleto,
+                    Rol = usuario.Rol,
+                    Activo = usuario.Activo,
+                    FechaCreacion = usuario.FechaCreacion,
+                    FechaModificacion = usuario.FechaModificacion
+                }
             });
         }
 

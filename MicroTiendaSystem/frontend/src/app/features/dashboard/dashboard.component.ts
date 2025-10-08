@@ -36,6 +36,11 @@ import { AuthService } from '../../core/services/auth.service';
     <div class="dashboard-container">
       <h1>Dashboard de Ventas</h1>
       
+      <!-- Debug info (temporal) -->
+      <div style="background: #f0f0f0; padding: 8px; margin-bottom: 16px; border-radius: 4px; font-size: 12px;">
+        <strong>Debug:</strong> isAdmin = {{isAdmin}} | Usuario: {{currentUser?.nombreCompleto}} | Rol: {{currentUser?.rol}}
+      </div>
+      
       <!-- Pestañas de navegación -->
       <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="dashboard-tabs">
         <!-- Pestaña Dashboard -->
@@ -386,6 +391,7 @@ export class DashboardComponent implements OnInit {
   selectedPeriod: 'semanal' | 'mensual' | 'anual' = 'semanal';
   selectedTabIndex: number = 0;
   isAdmin: boolean = false;
+  currentUser: any = null;
 
   // Configuración del gráfico de ventas
   salesChartType: 'line' = 'line';
@@ -455,11 +461,23 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.loadDashboardData();
     this.checkUserRole();
+    
+    // Escuchar cambios en el usuario actual
+    this.authService.currentUser$.subscribe(user => {
+      console.log('🔍 Dashboard - Usuario cambió:', user);
+      this.currentUser = user;
+      this.isAdmin = user?.rol === 'Admin';
+      console.log('🔍 Dashboard - Es admin?:', this.isAdmin);
+    });
   }
 
   checkUserRole(): void {
     const currentUser = this.authService.getCurrentUser();
+    console.log('🔍 Dashboard - Usuario actual:', currentUser);
+    console.log('🔍 Dashboard - Rol del usuario:', currentUser?.rol);
+    this.currentUser = currentUser;
     this.isAdmin = currentUser?.rol === 'Admin';
+    console.log('🔍 Dashboard - Es admin?:', this.isAdmin);
   }
 
   loadDashboardData(): void {

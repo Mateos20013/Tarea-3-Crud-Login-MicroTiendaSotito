@@ -400,14 +400,17 @@ export class VentaFormComponent implements OnInit {
   }
 
   cargarProductos(): void {
+    console.log('🔍 VentaForm - Iniciando carga de productos...');
     this.loading.set(true);
     this.productosService.getProductos({ activo: true }).subscribe({
       next: (productos) => {
+        console.log('✅ VentaForm - Productos cargados:', productos);
+        console.log('📊 VentaForm - Cantidad de productos:', productos.length);
         this.productos.set(productos);
         this.loading.set(false);
       },
       error: (error) => {
-        console.error('Error al cargar productos:', error);
+        console.error('❌ VentaForm - Error al cargar productos:', error);
         this.loading.set(false);
       }
     });
