@@ -282,3 +282,4 @@ C:\Users\mateo\Documents\Septimo Semestre\Ingeneria WEB\MicroTiendaSystem\MicroT
 C:\Users\mateo\Documents\Septimo Semestre\Ingeneria WEB\MicroTiendaSystem\MicroTienda.API\obj\Debug\net9.0\MicroTienda.API.pdb
 C:\Users\mateo\Documents\Septimo Semestre\Ingeneria WEB\MicroTiendaSystem\MicroTienda.API\obj\Debug\net9.0\MicroTienda.API.genruntimeconfig.cache
 C:\Users\mateo\Documents\Septimo Semestre\Ingeneria WEB\MicroTiendaSystem\MicroTienda.API\obj\Debug\net9.0\ref\MicroTienda.API.dll
+C:\Users\mateo\Documents\Septimo Semestre\Ingeneria WEB\MicroTiendaSystem\MicroTienda.API\obj\Debug\net9.0\MicroTienda.API.sourcelink.json

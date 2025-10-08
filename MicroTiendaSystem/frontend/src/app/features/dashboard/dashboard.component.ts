@@ -6,11 +6,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatTabsModule } from '@angular/material/tabs';
 import { BaseChartDirective } from 'ng2-charts';
 import { Chart, ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
 import { DashboardService } from '../../core/services/dashboard.service';
 import { Dashboard } from '../../core/models';
+import { ProductosListComponent } from '../productos/productos-list.component';
+import { VentasListComponent } from '../ventas/ventas-list.component';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,13 +27,21 @@ import { Dashboard } from '../../core/models';
     MatGridListModule,
     MatSelectModule,
     MatFormFieldModule,
-    BaseChartDirective
+    MatTabsModule,
+    BaseChartDirective,
+    ProductosListComponent,
+    VentasListComponent
   ],
   template: `
     <div class="dashboard-container">
       <h1>Dashboard de Ventas</h1>
       
-      <!-- Tarjetas de métricas -->
+      <!-- Pestañas de navegación -->
+      <mat-tab-group [(selectedIndex)]="selectedTabIndex" class="dashboard-tabs">
+        <!-- Pestaña Dashboard -->
+        <mat-tab label="Dashboard">
+          <div class="tab-content">
+            <!-- Tarjetas de métricas -->
       <div class="metrics-grid">
         <mat-card class="metric-card">
           <mat-card-content>
@@ -146,6 +158,23 @@ import { Dashboard } from '../../core/models';
           </div>
         </mat-card-content>
       </mat-card>
+          </div>
+        </mat-tab>
+        
+        <!-- Pestaña Productos (solo para administradores) -->
+        <mat-tab label="Gestión de Productos" *ngIf="isAdmin">
+          <div class="tab-content">
+            <app-productos-list></app-productos-list>
+          </div>
+        </mat-tab>
+        
+        <!-- Pestaña Ventas -->
+        <mat-tab label="Gestión de Ventas">
+          <div class="tab-content">
+            <app-ventas-list></app-ventas-list>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
     </div>
   `,
   styles: [`
@@ -306,11 +335,57 @@ import { Dashboard } from '../../core/models';
       font-weight: 600;
       color: #4caf50;
     }
+
+    /* Estilos para las pestañas */
+    .dashboard-tabs {
+      margin-top: 16px;
+    }
+
+    .dashboard-tabs ::ng-deep .mat-mdc-tab-group {
+      --mdc-tab-indicator-active-indicator-color: #3f51b5;
+    }
+
+    .dashboard-tabs ::ng-deep .mat-mdc-tab {
+      min-width: 160px;
+    }
+
+    .tab-content {
+      padding: 24px 0;
+    }
+
+    /* Responsividad mejorada */
+    @media (max-width: 768px) {
+      .dashboard-container {
+        padding: 8px 16px;
+      }
+      
+      .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      
+      .metric-card {
+        height: 100px;
+      }
+      
+      .metric-icon {
+        font-size: 36px;
+        width: 36px;
+        height: 36px;
+      }
+      
+      .dashboard-tabs ::ng-deep .mat-mdc-tab {
+        min-width: auto;
+        padding: 0 12px;
+      }
+    }
   `]
 })
 export class DashboardComponent implements OnInit {
   dashboardData: Dashboard | null = null;
   selectedPeriod: 'semanal' | 'mensual' | 'anual' = 'semanal';
+  selectedTabIndex: number = 0;
+  isAdmin: boolean = false;
 
   // Configuración del gráfico de ventas
   salesChartType: 'line' = 'line';
@@ -372,10 +447,19 @@ export class DashboardComponent implements OnInit {
     }
   };
 
-  constructor(private dashboardService: DashboardService) {}
+  constructor(
+    private dashboardService: DashboardService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.loadDashboardData();
+    this.checkUserRole();
+  }
+
+  checkUserRole(): void {
+    const currentUser = this.authService.getCurrentUser();
+    this.isAdmin = currentUser?.rol === 'Admin';
   }
 
   loadDashboardData(): void {
