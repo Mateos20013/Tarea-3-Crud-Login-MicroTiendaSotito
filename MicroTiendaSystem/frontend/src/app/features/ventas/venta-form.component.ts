@@ -105,7 +105,7 @@ import { Producto, CreateVenta, CreateVentaDetalle } from '../../core/models';
                       <mat-option [value]="producto">
                         <div class="producto-option">
                           <span class="nombre">{{ producto.nombre }}</span>
-                          <span class="precio">{{ producto.precio | currency:'COP':'symbol':'1.0-0' }}</span>
+                          <span class="precio">{{ producto.precio | currency:'USD':'symbol':'1.2-2' }}</span>
                           <span class="stock">Stock: {{ producto.stock }}</span>
                         </div>
                       </mat-option>
@@ -116,7 +116,7 @@ import { Producto, CreateVenta, CreateVentaDetalle } from '../../core/models';
 
               <!-- Tabla de Productos -->
               <div class="table-container">
-                <table mat-table [dataSource]="detalles.controls" class="full-width-table">
+                <table mat-table [dataSource]="dataSource()" class="full-width-table">
                   <ng-container matColumnDef="producto">
                     <th mat-header-cell *matHeaderCellDef>Producto</th>
                     <td mat-cell *matCellDef="let detalle; let i = index">
@@ -138,7 +138,7 @@ import { Producto, CreateVenta, CreateVentaDetalle } from '../../core/models';
                   <ng-container matColumnDef="precio">
                     <th mat-header-cell *matHeaderCellDef>Precio Unit.</th>
                     <td mat-cell *matCellDef="let detalle; let i = index">
-                      {{ getPrecioUnitario(i) | currency:'COP':'symbol':'1.0-0' }}
+                      {{ getPrecioUnitario(i) | currency:'USD':'symbol':'1.2-2' }}
                     </td>
                   </ng-container>
 
@@ -156,7 +156,7 @@ import { Producto, CreateVenta, CreateVentaDetalle } from '../../core/models';
                   <ng-container matColumnDef="subtotal">
                     <th mat-header-cell *matHeaderCellDef>Subtotal</th>
                     <td mat-cell *matCellDef="let detalle; let i = index">
-                      <strong>{{ calcularSubtotalDetalle(i) | currency:'COP':'symbol':'1.0-0' }}</strong>
+                      <strong>{{ calcularSubtotalDetalle(i) | currency:'USD':'symbol':'1.2-2' }}</strong>
                     </td>
                   </ng-container>
 
@@ -192,19 +192,19 @@ import { Producto, CreateVenta, CreateVentaDetalle } from '../../core/models';
               <div class="totales">
                 <div class="total-row">
                   <span>Subtotal:</span>
-                  <span>{{ subtotal() | currency:'COP':'symbol':'1.0-0' }}</span>
+                  <span>{{ subtotal() | currency:'USD':'symbol':'1.2-2' }}</span>
                 </div>
                 <div class="total-row">
                   <span>Descuento:</span>
-                  <span>{{ descuentoTotal() | currency:'COP':'symbol':'1.0-0' }}</span>
+                  <span>{{ descuentoTotal() | currency:'USD':'symbol':'1.2-2' }}</span>
                 </div>
                 <div class="total-row">
                   <span>Impuesto (19%):</span>
-                  <span>{{ impuesto() | currency:'COP':'symbol':'1.0-0' }}</span>
+                  <span>{{ impuesto() | currency:'USD':'symbol':'1.2-2' }}</span>
                 </div>
                 <div class="total-row final">
                   <span><strong>Total:</strong></span>
-                  <span><strong>{{ total() | currency:'COP':'symbol':'1.0-0' }}</strong></span>
+                  <span><strong>{{ total() | currency:'USD':'symbol':'1.2-2' }}</strong></span>
                 </div>
               </div>
             </div>
@@ -343,6 +343,7 @@ export class VentaFormComponent implements OnInit {
   loading = signal(false);
   productos = signal<Producto[]>([]);
   productosSeleccionados = signal<Producto[]>([]);
+  dataSource = signal<any[]>([]);
 
   productoSearchControl = this.fb.control('');
   filteredProductos$!: Observable<Producto[]>;
@@ -356,30 +357,40 @@ export class VentaFormComponent implements OnInit {
 
   displayedColumns = ['producto', 'cantidad', 'precio', 'descuento', 'subtotal', 'acciones'];
 
-  // Computed values
+  // Computed values con effect para forzar recálculo
   subtotal = computed(() => {
-    return this.detalles.controls.reduce((sum: number, control: any) => {
-      const detalle = control.value;
-      return sum + this.calcularSubtotalDetalle(this.detalles.controls.indexOf(control));
-    }, 0);
+    // Usar dataSource para forzar reactividad
+    const items = this.dataSource();
+    let sum = 0;
+    for (let i = 0; i < this.detalles.length; i++) {
+      sum += this.calcularSubtotalDetalle(i);
+    }
+    console.log('💰 Subtotal calculado:', sum);
+    return sum;
   });
 
   descuentoTotal = computed(() => {
     const descuentoGeneral = this.ventaForm.get('descuentoGeneral')?.value || 0;
-    return this.subtotal() * (descuentoGeneral / 100);
+    const desc = this.subtotal() * (descuentoGeneral / 100);
+    console.log('🏷️ Descuento total calculado:', desc);
+    return desc;
   });
 
   impuesto = computed(() => {
-    return (this.subtotal() - this.descuentoTotal()) * 0.19;
+    const imp = (this.subtotal() - this.descuentoTotal()) * 0.19;
+    console.log('📊 Impuesto calculado:', imp);
+    return imp;
   });
 
   total = computed(() => {
-    return this.subtotal() - this.descuentoTotal() + this.impuesto();
+    const tot = this.subtotal() - this.descuentoTotal() + this.impuesto();
+    console.log('🧮 Total calculado:', tot);
+    return tot;
   });
 
   ngOnInit(): void {
-    this.cargarProductos();
     this.setupAutocomplete();
+    this.cargarProductos();
   }
 
   get detalles() {
@@ -391,10 +402,16 @@ export class VentaFormComponent implements OnInit {
       startWith(''),
       map(value => {
         const filterValue = typeof value === 'string' ? value.toLowerCase() : '';
-        return this.productos().filter(producto => 
+        const productos = this.productos();
+        console.log('🔍 Autocomplete - Productos disponibles:', productos.length);
+        console.log('🔍 Autocomplete - Filtro:', filterValue);
+        const filtered = productos.filter(producto => 
           producto.nombre.toLowerCase().includes(filterValue) && 
-          producto.stock > 0
+          producto.stock > 0 &&
+          producto.activo !== false
         );
+        console.log('✅ Autocomplete - Productos filtrados:', filtered.length);
+        return filtered;
       })
     );
   }
@@ -406,6 +423,9 @@ export class VentaFormComponent implements OnInit {
       next: (productos) => {
         console.log('✅ VentaForm - Productos cargados:', productos);
         console.log('📊 VentaForm - Cantidad de productos:', productos.length);
+        if (productos && productos.length > 0) {
+          console.log('📦 VentaForm - Primer producto:', productos[0]);
+        }
         this.productos.set(productos);
         this.loading.set(false);
       },
@@ -421,23 +441,28 @@ export class VentaFormComponent implements OnInit {
   }
 
   onProductoSelected(event: any): void {
+    console.log('🎯 Producto seleccionado del autocomplete:', event);
     const producto = event.option.value as Producto;
+    console.log('📦 Producto a agregar:', producto);
     this.agregarProductoDetalle(producto);
     this.productoSearchControl.setValue('');
   }
 
   agregarProducto(): void {
     // Método alternativo para agregar productos manualmente
-    console.log('Agregar producto manualmente');
+    console.log('⚠️ Agregar producto manualmente - No implementado');
   }
 
   agregarProductoDetalle(producto: Producto): void {
+    console.log('➕ agregarProductoDetalle llamado con:', producto);
+    
     // Verificar que el producto no esté ya agregado
     const existingIndex = this.detalles.controls.findIndex((control: any) => 
       control.get('productoId')?.value === producto.productoId
     );
 
     if (existingIndex >= 0) {
+      console.log('✏️ Producto ya existe, incrementando cantidad en índice:', existingIndex);
       // Si ya existe, incrementar cantidad
       const cantidadControl = this.getCantidadControl(existingIndex);
       cantidadControl.setValue(cantidadControl.value + 1);
@@ -445,6 +470,8 @@ export class VentaFormComponent implements OnInit {
       return;
     }
 
+    console.log('🆕 Agregando nuevo producto al detalle');
+    
     // Agregar nuevo detalle
     const detalleForm = this.fb.group({
       productoId: [producto.productoId, Validators.required],
@@ -458,6 +485,13 @@ export class VentaFormComponent implements OnInit {
     const currentProducts = this.productosSeleccionados();
     this.productosSeleccionados.set([...currentProducts, producto]);
     
+    // Actualizar dataSource para la tabla
+    this.dataSource.set([...this.detalles.controls]);
+    
+    console.log('✅ Producto agregado. Total de detalles:', this.detalles.length);
+    console.log('✅ Productos seleccionados:', this.productosSeleccionados().length);
+    console.log('✅ DataSource actualizado:', this.dataSource().length);
+    
     this.recalcularTotales();
   }
 
@@ -468,6 +502,9 @@ export class VentaFormComponent implements OnInit {
     const currentProducts = this.productosSeleccionados();
     currentProducts.splice(index, 1);
     this.productosSeleccionados.set([...currentProducts]);
+    
+    // Actualizar dataSource
+    this.dataSource.set([...this.detalles.controls]);
     
     this.recalcularTotales();
   }
@@ -539,8 +576,9 @@ export class VentaFormComponent implements OnInit {
   }
 
   recalcularTotales(): void {
-    // Los computed se actualizarán automáticamente
-    // Este método se puede usar para disparar cambios si es necesario
+    // Forzar actualización del dataSource para que los computed reaccionen
+    this.dataSource.set([...this.detalles.controls]);
+    console.log('🔄 Totales recalculados. DataSource actualizado:', this.dataSource().length);
   }
 
   guardarVenta(): void {

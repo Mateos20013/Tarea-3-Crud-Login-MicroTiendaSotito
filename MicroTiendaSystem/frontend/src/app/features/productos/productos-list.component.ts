@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -213,7 +213,8 @@ export class ProductosListComponent implements OnInit {
   constructor(
     private productosService: ProductosService,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -224,13 +225,20 @@ export class ProductosListComponent implements OnInit {
     this.loading = true;
     this.productosService.getProductos().subscribe({
       next: (productos) => {
-        this.productos = productos || [];
-        this.loading = false;
-        console.log('✅ Productos cargados:', productos.length);
+        // Usar setTimeout para evitar NG0100
+        setTimeout(() => {
+          this.productos = productos || [];
+          this.loading = false;
+          this.cdr.markForCheck();
+          console.log('✅ Productos cargados:', productos.length);
+        }, 0);
       },
       error: (error) => {
         console.error('❌ Error al cargar productos:', error);
-        this.loading = false;
+        setTimeout(() => {
+          this.loading = false;
+          this.cdr.markForCheck();
+        }, 0);
         this.snackBar.open('Error al cargar productos', 'Cerrar', { duration: 3000 });
       }
     });
@@ -252,12 +260,18 @@ export class ProductosListComponent implements OnInit {
         this.loading = true;
         this.productosService.deleteProducto(id).subscribe({
           next: () => {
-            this.loading = false;
+            setTimeout(() => {
+              this.loading = false;
+              this.cdr.markForCheck();
+            }, 0);
             this.snackBar.open('Producto eliminado exitosamente', 'Cerrar', { duration: 3000 });
             this.cargarProductos(); // Recargar la lista
           },
           error: (error) => {
-            this.loading = false;
+            setTimeout(() => {
+              this.loading = false;
+              this.cdr.markForCheck();
+            }, 0);
             console.error('❌ Error al eliminar producto:', error);
             this.snackBar.open('Error al eliminar producto', 'Cerrar', { duration: 3000 });
           }

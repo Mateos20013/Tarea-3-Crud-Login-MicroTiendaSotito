@@ -131,7 +131,7 @@ import { Venta } from '../../core/models';
               <ng-container matColumnDef="total">
                 <th mat-header-cell *matHeaderCellDef>Total</th>
                 <td mat-cell *matCellDef="let venta">
-                  <strong>{{ venta.total | currency:'COP':'symbol':'1.0-0' }}</strong>
+                  <strong>{{ venta.total | currency:'USD':'symbol':'1.2-2' }}</strong>
                 </td>
               </ng-container>
 

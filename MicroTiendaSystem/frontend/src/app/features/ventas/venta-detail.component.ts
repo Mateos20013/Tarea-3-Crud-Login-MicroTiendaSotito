@@ -107,7 +107,7 @@ import { Venta } from '../../core/models';
                   <ng-container matColumnDef="precioUnitario">
                     <th mat-header-cell *matHeaderCellDef>Precio Unitario</th>
                     <td mat-cell *matCellDef="let detalle">
-                      {{ detalle.precioUnitario | currency:'COP':'symbol':'1.0-0' }}
+                      {{ detalle.precioUnitario | currency:'USD':'symbol':'1.2-2' }}
                     </td>
                   </ng-container>
 
@@ -116,7 +116,7 @@ import { Venta } from '../../core/models';
                     <td mat-cell *matCellDef="let detalle">
                       @if (detalle.descuento > 0) {
                         <span class="descuento">
-                          {{ detalle.descuento | currency:'COP':'symbol':'1.0-0' }}
+                          {{ detalle.descuento | currency:'USD':'symbol':'1.2-2' }}
                         </span>
                       } @else {
                         <span class="no-descuento">--</span>
@@ -127,7 +127,7 @@ import { Venta } from '../../core/models';
                   <ng-container matColumnDef="subtotal">
                     <th mat-header-cell *matHeaderCellDef>Subtotal</th>
                     <td mat-cell *matCellDef="let detalle">
-                      <strong>{{ detalle.subTotal | currency:'COP':'symbol':'1.0-0' }}</strong>
+                      <strong>{{ detalle.subTotal | currency:'USD':'symbol':'1.2-2' }}</strong>
                     </td>
                   </ng-container>
 
@@ -145,21 +145,21 @@ import { Venta } from '../../core/models';
               <div class="totales">
                 <div class="total-row">
                   <span>Subtotal:</span>
-                  <span>{{ ventaData.subTotal | currency:'COP':'symbol':'1.0-0' }}</span>
+                  <span>{{ ventaData.subTotal | currency:'USD':'symbol':'1.2-2' }}</span>
                 </div>
                 @if (ventaData.descuento > 0) {
                   <div class="total-row">
                     <span>Descuento:</span>
-                    <span class="descuento">-{{ ventaData.descuento | currency:'COP':'symbol':'1.0-0' }}</span>
+                    <span class="descuento">-{{ ventaData.descuento | currency:'USD':'symbol':'1.2-2' }}</span>
                   </div>
                 }
                 <div class="total-row">
                   <span>Impuesto (19%):</span>
-                  <span>{{ ventaData.impuesto | currency:'COP':'symbol':'1.0-0' }}</span>
+                  <span>{{ ventaData.impuesto | currency:'USD':'symbol':'1.2-2' }}</span>
                 </div>
                 <div class="total-row final">
                   <span><strong>Total Pagado:</strong></span>
-                  <span><strong>{{ ventaData.total | currency:'COP':'symbol':'1.0-0' }}</strong></span>
+                  <span><strong>{{ ventaData.total | currency:'USD':'symbol':'1.2-2' }}</strong></span>
                 </div>
               </div>
             </div>
@@ -186,11 +186,11 @@ import { Venta } from '../../core/models';
                     <div class="ticket-item">
                       <div class="item-name">{{ detalle.nombreProducto }}</div>
                       <div class="item-details">
-                        <span>{{ detalle.cantidad }} x {{ detalle.precioUnitario | currency:'COP':'symbol':'1.0-0' }}</span>
-                        <span class="item-subtotal">{{ detalle.subTotal | currency:'COP':'symbol':'1.0-0' }}</span>
+                        <span>{{ detalle.cantidad }} x {{ detalle.precioUnitario | currency:'USD':'symbol':'1.2-2' }}</span>
+                        <span class="item-subtotal">{{ detalle.subTotal | currency:'USD':'symbol':'1.2-2' }}</span>
                       </div>
                       @if (detalle.descuento > 0) {
-                        <div class="item-discount">Desc: {{ detalle.descuento | currency:'COP':'symbol':'1.0-0' }}</div>
+                        <div class="item-discount">Desc: {{ detalle.descuento | currency:'USD':'symbol':'1.2-2' }}</div>
                       }
                     </div>
                   }
@@ -200,22 +200,22 @@ import { Venta } from '../../core/models';
                 <div class="ticket-totals">
                   <div class="ticket-total">
                     <span>Subtotal:</span>
-                    <span>{{ ventaData.subTotal | currency:'COP':'symbol':'1.0-0' }}</span>
+                    <span>{{ ventaData.subTotal | currency:'USD':'symbol':'1.2-2' }}</span>
                   </div>
                   @if (ventaData.descuento > 0) {
                     <div class="ticket-total">
                       <span>Descuento:</span>
-                      <span>-{{ ventaData.descuento | currency:'COP':'symbol':'1.0-0' }}</span>
+                      <span>-{{ ventaData.descuento | currency:'USD':'symbol':'1.2-2' }}</span>
                     </div>
                   }
                   <div class="ticket-total">
                     <span>Impuesto:</span>
-                    <span>{{ ventaData.impuesto | currency:'COP':'symbol':'1.0-0' }}</span>
+                    <span>{{ ventaData.impuesto | currency:'USD':'symbol':'1.2-2' }}</span>
                   </div>
                   <hr>
                   <div class="ticket-total final">
                     <span><strong>TOTAL:</strong></span>
-                    <span><strong>{{ ventaData.total | currency:'COP':'symbol':'1.0-0' }}</strong></span>
+                    <span><strong>{{ ventaData.total | currency:'USD':'symbol':'1.2-2' }}</strong></span>
                   </div>
                 </div>
 
