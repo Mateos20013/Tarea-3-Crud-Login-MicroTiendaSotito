@@ -73,12 +73,6 @@ import { Usuario } from '../../core/models';
             </button>
           </mat-menu>
         </div>
-
-        <!-- Botones de auth si no está logueado -->
-        <div class="navbar-auth" *ngIf="!currentUser">
-          <a mat-button routerLink="/auth/login">Iniciar Sesión</a>
-          <a mat-raised-button color="accent" routerLink="/auth/register">Registrarse</a>
-        </div>
       </div>
     </mat-toolbar>
   `,
@@ -202,17 +196,6 @@ import { Usuario } from '../../core/models';
     .user-role.role-vendedor {
       background-color: #f3e5f5;
       color: #7b1fa2;
-    }
-
-    .navbar-auth {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .navbar-auth a {
-      color: white;
-      text-decoration: none;
     }
 
     @media (max-width: 768px) {

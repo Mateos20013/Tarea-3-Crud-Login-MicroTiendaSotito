@@ -29,7 +29,7 @@ import { Subject, takeUntil, tap, switchMap, filter, take } from 'rxjs';
     <div class="login-container">
       <div class="login-card">
         <div class="card-header">
-          <h1 class="title">🏪 MicroTienda</h1>
+          <h1 class="title">🏪 MicroTiendaSotito</h1>
           <p class="subtitle">Sistema de Gestión de Ventas</p>
         </div>
         

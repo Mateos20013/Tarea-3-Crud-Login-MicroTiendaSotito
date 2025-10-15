@@ -15,6 +15,9 @@ export class AuthService {
   private readonly TOKEN_KEY = 'microtienda_token';
   private readonly USER_KEY = 'microtienda_user';
 
+  // Usar sessionStorage en lugar de localStorage para que se limpie al cerrar el navegador
+  private storage = typeof sessionStorage !== 'undefined' ? sessionStorage : null;
+
   private currentUserSubject = new BehaviorSubject<Usuario | null>(this.initializeCurrentUser());
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -38,25 +41,25 @@ export class AuthService {
   }
 
   private cleanupCorruptedData(): void {
-    if (typeof localStorage === 'undefined') return;
+    if (!this.storage) return;
     
     try {
-      const token = localStorage.getItem(this.TOKEN_KEY);
-      const userData = localStorage.getItem(this.USER_KEY);
+      const token = this.storage.getItem(this.TOKEN_KEY);
+      const userData = this.storage.getItem(this.USER_KEY);
       
       // Limpiar datos inválidos
       if (token === 'null' || token === 'undefined') {
-        localStorage.removeItem(this.TOKEN_KEY);
+        this.storage.removeItem(this.TOKEN_KEY);
       }
       
       if (userData === 'null' || userData === 'undefined') {
-        localStorage.removeItem(this.USER_KEY);
+        this.storage.removeItem(this.USER_KEY);
       }
       
     } catch (error) {
       console.error('Error limpiando datos:', error);
-      localStorage.removeItem(this.TOKEN_KEY);
-      localStorage.removeItem(this.USER_KEY);
+      this.storage.removeItem(this.TOKEN_KEY);
+      this.storage.removeItem(this.USER_KEY);
     }
   }
 
@@ -93,37 +96,40 @@ export class AuthService {
   }
 
   logout(): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem(this.TOKEN_KEY);
-      localStorage.removeItem(this.USER_KEY);
+    console.log('🚪 AuthService.logout() - Cerrando sesión...');
+    if (this.storage) {
+      this.storage.removeItem(this.TOKEN_KEY);
+      this.storage.removeItem(this.USER_KEY);
+      console.log('✅ AuthService.logout() - SessionStorage limpiado');
     }
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
+    console.log('✅ AuthService.logout() - Sesión cerrada, redirigiendo a login');
     this.router.navigate(['/auth/login']);
   }
 
   getToken(): string | null {
-    if (typeof localStorage === 'undefined') {
+    if (!this.storage) {
       return null;
     }
-    return localStorage.getItem(this.TOKEN_KEY);
+    return this.storage.getItem(this.TOKEN_KEY);
   }
 
   getCurrentUser(): Usuario | null {
-    if (typeof localStorage === 'undefined') {
+    if (!this.storage) {
       return null;
     }
     try {
-      const userData = localStorage.getItem(this.USER_KEY);
+      const userData = this.storage.getItem(this.USER_KEY);
       if (!userData || userData === 'null' || userData === 'undefined') {
         return null;
       }
       return JSON.parse(userData);
     } catch (error) {
-      console.error('Error parsing user data from localStorage:', error);
+      console.error('Error parsing user data from sessionStorage:', error);
       // Limpiar datos corruptos
-      localStorage.removeItem(this.USER_KEY);
-      localStorage.removeItem(this.TOKEN_KEY);
+      this.storage.removeItem(this.USER_KEY);
+      this.storage.removeItem(this.TOKEN_KEY);
       return null;
     }
   }
@@ -140,13 +146,13 @@ export class AuthService {
   private setSession(authResponse: AuthResponse): void {
     console.log('💾 AuthService.setSession() - Guardando sesión para:', authResponse.usuario?.nombreUsuario);
     
-    if (typeof localStorage !== 'undefined') {
+    if (this.storage) {
       try {
-        localStorage.setItem(this.TOKEN_KEY, authResponse.token);
-        localStorage.setItem(this.USER_KEY, JSON.stringify(authResponse.usuario));
-        console.log('✅ AuthService.setSession() - Datos guardados en localStorage');
+        this.storage.setItem(this.TOKEN_KEY, authResponse.token);
+        this.storage.setItem(this.USER_KEY, JSON.stringify(authResponse.usuario));
+        console.log('✅ AuthService.setSession() - Datos guardados en sessionStorage (se eliminará al cerrar navegador)');
       } catch (error) {
-        console.error('❌ AuthService.setSession() - Error guardando en localStorage:', error);
+        console.error('❌ AuthService.setSession() - Error guardando en sessionStorage:', error);
       }
     }
     
@@ -166,7 +172,7 @@ export class AuthService {
   }
 
   private hasValidToken(): boolean {
-    if (typeof localStorage === 'undefined') {
+    if (!this.storage) {
       return false;
     }
     try {
