@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MicroTienda.API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fa34caad3f88a6886d8a197535a60e2c68bc2bfe")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d77f2865ce8a5874f53cf7710a9d8c152b9cb38c")]
 [assembly: System.Reflection.AssemblyProductAttribute("MicroTienda.API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MicroTienda.API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

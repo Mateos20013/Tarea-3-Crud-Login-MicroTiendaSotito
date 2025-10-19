@@ -15,7 +15,6 @@ export class AuthService {
   private readonly TOKEN_KEY = 'microtienda_token';
   private readonly USER_KEY = 'microtienda_user';
 
-  // Usar sessionStorage en lugar de localStorage para que se limpie al cerrar el navegador
   private storage = typeof sessionStorage !== 'undefined' ? sessionStorage : null;
 
   private currentUserSubject = new BehaviorSubject<Usuario | null>(this.initializeCurrentUser());

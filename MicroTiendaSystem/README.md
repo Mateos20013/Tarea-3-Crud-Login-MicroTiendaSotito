@@ -11,7 +11,6 @@ Sistema completo de punto de venta desarrollado con arquitectura cliente-servido
 - [Requisitos Previos](#-requisitos-previos)
 - [Instalación y Configuración](#-instalación-y-configuración)
 - [Ejecución del Proyecto](#-ejecución-del-proyecto)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
 - [API Endpoints](#-api-endpoints)
 - [Usuarios de Prueba](#-usuarios-de-prueba)
 - [Configuración de Base de Datos](#-configuración-de-base-de-datos)
@@ -41,7 +40,7 @@ El sistema sigue una arquitectura de 3 capas:
 ```
 ┌─────────────────────────────────────────────┐
 │          FRONTEND (Angular 20)              │
-│  • Componentes standalone                  │
+│  • Componentes standalone                   │
 │  • Angular Material UI                     │
 │  • Reactive Forms & Signals                │
 └─────────────────┬───────────────────────────┘
@@ -129,14 +128,6 @@ El sistema sigue una arquitectura de 3 capas:
 - Actualización automática de stock
 - Visualización de detalles de venta
 - Generación de ticket imprimible
-
-### 📊 Dashboard
-- Total de ventas del día/mes
-- Productos más vendidos
-- Productos con stock bajo
-- Gráficos interactivos
-- Estadísticas en tiempo real
-
 ---
 
 ## 📌 Requisitos Previos
@@ -146,7 +137,6 @@ Asegúrate de tener instalado:
 - **Node.js** v18+ y **npm** v9+ → [Descargar](https://nodejs.org/)
 - **.NET SDK 9.0** → [Descargar](https://dotnet.microsoft.com/download)
 - **PostgreSQL 14+** → [Descargar](https://www.postgresql.org/download/)
-- **Git** → [Descargar](https://git-scm.com/)
 
 ### Verificación de versiones
 
@@ -170,30 +160,18 @@ cd MicroTiendaSystem
 
 ### 2️⃣ Configurar Base de Datos PostgreSQL
 
-#### Opción A: Usando pgAdmin o DBeaver
 
-1. Crea una base de datos llamada `MicroTiendaDB`
-2. Usuario: `postgres`
-3. Contraseña: tu contraseña de PostgreSQL
-4. Puerto: `5432` (default)
+1. base de datos llamada `MicroTiendaDB`
+2. Puerto: `5432` (default)
 
-#### Opción B: Usando psql
 
-```bash
-psql -U postgres
-CREATE DATABASE "MicroTiendaDB";
-\q
-```
+### 3️⃣ Configuración Backend
 
-### 3️⃣ Configurar Backend
-
-**Navega al proyecto de API:**
+**Proyecto de API:**
 ```bash
 cd MicroTienda.API
 ```
 
-**Edita `appsettings.json` con tu configuración:**
-```json
 {
   "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Database=MicroTiendaDB;Username=postgres;Password=TU_CONTRASEÑA;Port=5432"
@@ -207,21 +185,21 @@ cd MicroTienda.API
 }
 ```
 
-**Restaurar dependencias:**
+**Restauración de dependencias:**
 ```bash
 dotnet restore
 ```
 
 **La aplicación creará automáticamente las tablas al ejecutarse por primera vez.**
 
-### 4️⃣ Configurar Frontend
+### 4️⃣ Configuración Frontend
 
-**Navega al proyecto frontend:**
+**Navegación al proyecto frontend:**
 ```bash
 cd ../frontend
 ```
 
-**Instalar dependencias:**
+**Instalación dependencias:**
 ```bash
 npm install
 ```
@@ -230,116 +208,33 @@ npm install
 
 ## ▶️ Ejecución del Proyecto
 
-### Método 1: Ejecutar Manualmente (Recomendado)
-
-**Terminal 1 - Backend:**
-```bash
-cd MicroTienda.API
-dotnet run
-```
-> El backend estará disponible en: **http://localhost:5163**  
-> Swagger UI: **http://localhost:5163/swagger**
-
-**Terminal 2 - Frontend:**
-```bash
-cd frontend
-npm start
-```
-> El frontend estará disponible en: **http://localhost:4200**
-
-### Método 2: Ejecutar con PowerShell (Ambos a la vez)
+### Ejecución con PowerShell 
 
 ```powershell
-# Desde la raíz del proyecto
+
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd MicroTienda.API; dotnet run"
 Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd frontend; npm start"
 ```
 
-### Método 3: Usando Visual Studio (Solo Backend)
+## API Endpoints
 
-1. Abre `MicroTiendaSystem.sln`
-2. Presiona `F5` o click en "Run"
-3. En otra terminal ejecuta el frontend con `npm start`
-
----
-
-## 📁 Estructura del Proyecto
-
-```
-MicroTiendaSystem/
-│
-├── MicroTienda.API/              # 🔧 Backend .NET
-│   ├── Controllers/              # Controladores REST
-│   │   ├── AuthController.cs     # Login, Register
-│   │   ├── ProductosController.cs
-│   │   ├── VentasController.cs
-│   │   └── DashboardController.cs
-│   ├── Models/                   # Entidades de base de datos
-│   │   ├── Usuario.cs
-│   │   ├── Producto.cs
-│   │   ├── Venta.cs
-│   │   └── VentaDetalle.cs
-│   ├── DTOs/                     # Data Transfer Objects
-│   ├── Data/                     # DbContext
-│   │   └── MicroTiendaContext.cs
-│   ├── Services/                 # Lógica de negocio
-│   │   └── JwtService.cs
-│   ├── Program.cs                # Configuración principal
-│   └── appsettings.json          # Configuración (DB, JWT)
-│
-├── frontend/                     # 🎨 Frontend Angular
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── core/             # Servicios, guards, modelos
-│   │   │   │   ├── guards/
-│   │   │   │   │   └── auth.guard.ts
-│   │   │   │   ├── interceptors/
-│   │   │   │   │   └── auth.interceptor.ts
-│   │   │   │   ├── services/
-│   │   │   │   │   ├── auth.service.ts
-│   │   │   │   │   ├── productos.service.ts
-│   │   │   │   │   └── ventas.service.ts
-│   │   │   │   └── models/       # Interfaces TypeScript
-│   │   │   ├── features/         # Módulos de funcionalidad
-│   │   │   │   ├── auth/         # Login, Register
-│   │   │   │   ├── dashboard/    # Dashboard principal
-│   │   │   │   ├── productos/    # CRUD productos
-│   │   │   │   └── ventas/       # CRUD ventas
-│   │   │   ├── shared/           # Componentes compartidos
-│   │   │   │   └── components/
-│   │   │   │       ├── navbar.component.ts
-│   │   │   │       └── confirm-dialog.component.ts
-│   │   │   ├── app.routes.ts     # Configuración de rutas
-│   │   │   └── app.ts            # Componente raíz
-│   │   └── index.html            # HTML principal
-│   ├── angular.json              # Configuración Angular
-│   └── package.json              # Dependencias npm
-│
-├── MicroTiendaSystem.sln         # Solución Visual Studio
-└── README.md                     # Este archivo
-```
-
----
-
-## 🌐 API Endpoints
-
-### 🔐 Autenticación (`/api/Auth`)
+### Autenticación (`/api/Auth`)
 
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
-| POST | `/api/Auth/login` | Iniciar sesión | ❌ |
-| POST | `/api/Auth/register` | Registrar usuario | ❌ |
-| POST | `/api/Auth/validate-token` | Validar token JWT | ✅ |
+| POST | `/api/Auth/login` | Iniciar sesión | 
+| POST | `/api/Auth/register` | Registrar usuario | 
+| POST | `/api/Auth/validate-token` | Validar token JWT | 
 
-### 📦 Productos (`/api/Productos`)
+### Productos (`/api/Productos`)
 
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
-| GET | `/api/Productos` | Listar productos (con filtros) | ✅ |
-| GET | `/api/Productos/{id}` | Obtener producto por ID | ✅ |
-| POST | `/api/Productos` | Crear producto | ✅ |
-| PUT | `/api/Productos/{id}` | Actualizar producto | ✅ |
-| DELETE | `/api/Productos/{id}` | Eliminar producto (soft delete) | ✅ |
+| GET | `/api/Productos` | Listar productos |
+| GET | `/api/Productos/{id}` | Obtener producto por ID | 
+| POST | `/api/Productos` | Crear producto | 
+| PUT | `/api/Productos/{id}` | Actualizar producto | 
+| DELETE | `/api/Productos/{id}` | Eliminar producto (soft delete) | 
 
 **Query Parameters para GET:**
 - `buscar` (string): Búsqueda por nombre
@@ -348,26 +243,19 @@ MicroTiendaSystem/
 - `page` (int): Número de página
 - `pageSize` (int): Registros por página
 
-### 💰 Ventas (`/api/Ventas`)
+### Ventas (`/api/Ventas`)
 
 | Método | Endpoint | Descripción | Auth |
 |--------|----------|-------------|------|
-| GET | `/api/Ventas` | Listar ventas | ✅ |
-| GET | `/api/Ventas/{id}` | Obtener venta por ID | ✅ |
-| POST | `/api/Ventas` | Crear venta | ✅ |
-| PUT | `/api/Ventas/{id}/cancelar` | Cancelar venta (reversa stock) | ✅ |
+| GET | `/api/Ventas` | Listar ventas | 
+| GET | `/api/Ventas/{id}` | Obtener venta por ID | 
+| POST | `/api/Ventas` | Crear venta | 
+| PUT | `/api/Ventas/{id}/cancelar` | Cancelar venta (reversa stock) | 
 
-### 📊 Dashboard (`/api/Dashboard`)
-
-| Método | Endpoint | Descripción | Auth |
-|--------|----------|-------------|------|
-| GET | `/api/Dashboard/estadisticas` | Obtener estadísticas generales | ✅ |
 
 ---
 
 ## 👥 Usuarios de Prueba
-
-El sistema crea automáticamente usuarios de prueba al iniciar:
 
 ### 👨‍💼 Administrador
 - **Usuario**: `admin`
@@ -444,20 +332,10 @@ El sistema crea 3 productos de ejemplo:
 
 ---
 
-## 🔧 Solución de Problemas
-
-### Error de conexión a PostgreSQL
-```bash
-# Verifica que PostgreSQL esté corriendo
-sudo service postgresql status  # Linux
-# O verifica en Servicios de Windows
-
-# Verifica credenciales en appsettings.json
-```
 
 ### Puerto 5163 o 4200 en uso
 ```bash
-# Windows - Liberar puerto
+# Windows 
 netstat -ano | findstr :5163
 taskkill /PID <PID> /F
 
@@ -465,31 +343,22 @@ taskkill /PID <PID> /F
 lsof -ti:5163 | xargs kill -9
 ```
 
-### Error de CORS
-- Verifica que el backend permita `http://localhost:4200`
-- Revisa `Program.cs` en la sección CORS
-
-### Sesión no persiste
-- La aplicación usa `sessionStorage` (se limpia al cerrar navegador)
-- Esto es intencional para mayor seguridad
-
 ---
 
-## 📝 Notas Importantes
+##  Notas Importantes
 
-- ⚠️ **Seguridad**: Cambia `JwtSettings.SecretKey` en producción
-- 💾 **Sesiones**: Se usan sessionStorage (se cierran al cerrar navegador)
-- 💵 **Moneda**: Configurada en USD con formato de 2 decimales
-- 🔄 **CORS**: Configurado para desarrollo (localhost:4200)
-- 📊 **Impuesto**: Fijo del 19% (IVA)
+- **Seguridad**: Cambia `JwtSettings.SecretKey` en producción
+- **Sesiones**: Se usan sessionStorage (se cierran al cerrar navegador)
+- **Moneda**: Configurada en USD con formato de 2 decimales
+- **CORS**: Configurado para desarrollo (localhost:4200)
+- **Impuesto**: Fijo del 19% (IVA)
 
 ---
 
 ## 👨‍💻 Autor
 
-**Mateo Sotito**  
+**Mateo Sotomayor**  
 Ingeniería en Sistemas - Séptimo Semestre  
-Universidad [Tu Universidad]
 
 ---
 
@@ -503,10 +372,9 @@ Este proyecto fue desarrollado con fines académicos.
 
 Si encuentras algún problema o tienes preguntas:
 
-1. Revisa la sección de [Solución de Problemas](#-solución-de-problemas)
-2. Verifica los logs en la consola del navegador y terminal
-3. Asegúrate de tener todas las dependencias instaladas
-4. Contacta al desarrollador
+1. Verifica los logs en la consola del navegador y terminal
+2. Asegúrate de tener todas las dependencias instaladas
+3. Contacta al desarrollador
 
 ---
 
